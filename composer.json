@@ -1,0 +1,20 @@
+{
+    "name": "jayrods/alura-mvc",
+    "authors": [
+        {
+            "name": "jaderson",
+            "email": "jadersonrilidio@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Jayrods\\AluraMvc\\": "src/"
+        }
+    },
+    "require": {},
+    "scripts": {
+        "db-init": "php bin/create_db",
+        "vid-list": "php bin/get_all_videos_list",
+        "serve": "php -S localhost:8000 -t public/"
+    }
+}

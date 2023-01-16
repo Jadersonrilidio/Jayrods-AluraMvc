@@ -1,0 +1,4 @@
+/vendor/
+/trash/
+.env
+composer.lock

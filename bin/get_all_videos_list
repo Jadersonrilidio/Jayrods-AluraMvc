@@ -1,0 +1,14 @@
+#!usr/bin/env php
+<?php
+
+$dbPath = __DIR__ . '/../database/database.sqlite';
+
+$pdo = new PDO('sqlite:' . $dbPath);
+
+$query = "SELECT * FROM videos;";
+
+$stmt = $pdo->query($query);
+
+while ($video = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    echo "| Video ID:\t" . $video['id']  . "\t| Title:\t" . $video['title'] . "\t| URL:\t" . $video['url'] . PHP_EOL;
+}
