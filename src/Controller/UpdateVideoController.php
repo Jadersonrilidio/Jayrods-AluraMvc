@@ -26,52 +26,26 @@ class UpdateVideoController implements Controller
      */
     public function processRequisition(): void
     {
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-        
-        $video = new Video(null, '', '');
-        
-        if ($id !== false and $id !== null) {
-            $video = $this->videoRepository->get($id);
-        }
-
-        require_once __DIR__ . '/../../inicio.php'; ?>
-
-        <main class="container">
-            <form class="container__formulario" method="POST" action="<?php ($video->id() !== null) ? "/editar-video?id=" . $video->id() : '/novo-video'; ?>">
-                <h2 class="formulario__titulo">Edite seu vídeo</h2>
-                <div class="formulario__campo">
-                    <label class="campo__etiqueta" for="url">Link embed</label>
-                    <input name="url" class="campo__escrita" required placeholder="Por exemplo: https://www.youtube.com/embed/FAY1K2aUg5g" id='url' value="<?= $video->url() ?? ''; ?>" />
-                </div>
-                <div class="formulario__campo">
-                    <label class="campo__etiqueta" for="titulo">Titulo do vídeo</label>
-                    <input name="title" class="campo__escrita" required placeholder="Neste campo, dê o nome do vídeo" id='title' value="<?= $video->title() ?? ''; ?>" />
-                </div>
-                <input type="hidden" name="id" value="<?= $video->id() ?? ''; ?>" />
-                <input class="formulario__botao" type="submit" value="Enviar" />
-            </form>
-        </main>
-
-        <?php require_once __DIR__ . '/../../fim.php';
-    }
-
-    /**
-     * 
-     */
-    public function updateVideo(): void
-    {
         $url = filter_input(INPUT_POST, 'url', FILTER_VALIDATE_URL);
-        $title = filter_input(INPUT_POST, 'title');
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-
-        if ($url === false or $url === null or $id === false or $id === null) {
+        if ($url === false) {
             header('Location: /?success=0');
-            exit;
+            return;
         }
-        
-        $video = new Video($id, $url, $title);
-        
-        $result = $this->videoRepository->update($video);
+
+        $title = filter_input(INPUT_POST, 'title');
+        if ($title === false) {
+            header('Location: /?success=0');
+            return;
+        }
+
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+        if ($id === false or $id === null) {
+            header('Location: /?success=0');
+            return;
+        }
+
+        $result = $this->videoRepository
+            ->update(new Video($id, $url, $title));
 
         $result ? header('Location: /?success=1') : header('Location: /?success=0');
     }

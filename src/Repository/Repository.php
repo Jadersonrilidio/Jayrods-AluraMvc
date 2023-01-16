@@ -8,7 +8,7 @@ interface Repository
 {
     public function all(): array;
 
-    public function get(int $identifier): Entity;
+    public function find(int $identifier): Entity;
 
     //todo
     // public function add(Entity $entity): Entity; 

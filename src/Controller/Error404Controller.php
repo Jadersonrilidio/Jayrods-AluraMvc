@@ -4,13 +4,15 @@ namespace Jayrods\AluraMvc\Controller;
 
 use Jayrods\AluraMvc\Controller\Controller;
 
-class NotFoundController implements Controller
+class Error404Controller implements Controller
 {
     /**
      * 
      */
     public function processRequisition(): void
     {
+        http_response_code(404);
+
         require_once __DIR__ . '/../../inicio.php'; ?>
 
         <main class="container">

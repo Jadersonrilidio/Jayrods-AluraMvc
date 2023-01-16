@@ -110,7 +110,7 @@ class VideoRepository implements Repository
      * 
      * @return Video[]
      */
-    public function get(int $id): Video
+    public function find(int $id): Video
     {
         $query = "SELECT * FROM videos WHERE id = :id;";
 
@@ -118,12 +118,25 @@ class VideoRepository implements Repository
 
         $stmt->bindValue(':id', intval($id), PDO::PARAM_INT);
         $stmt->execute();
-        $videoData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return new Video(
-            $videoData['id'],
-            $videoData['url'],
-            $videoData['title']
-        );
+        return $this->hydrateVideo($stmt)[0];
+    }
+
+    /**
+     * 
+     */
+    public function hydrateVideo($stmt)
+    {
+        $videoCollection = array();
+
+        while ($videoData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $videoCollection[] = new Video(
+                (int) $videoData['id'],
+                $videoData['url'],
+                $videoData['title']
+            );
+        }
+
+        return $videoCollection;
     }
 }
