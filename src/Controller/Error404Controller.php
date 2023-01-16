@@ -3,9 +3,23 @@
 namespace Jayrods\AluraMvc\Controller;
 
 use Jayrods\AluraMvc\Controller\Controller;
+use Jayrods\AluraMvc\Repository\VideoRepository;
 
 class Error404Controller implements Controller
 {
+    /**
+     * 
+     */
+    private VideoRepository $videoRepository;
+
+    /**
+     * 
+     */
+    public function __construct(VideoRepository $videoRepository)
+    {
+        $this->videoRepository = $videoRepository;
+    }
+
     /**
      * 
      */
@@ -13,7 +27,7 @@ class Error404Controller implements Controller
     {
         http_response_code(404);
 
-        require_once __DIR__ . '/../../inicio.php'; ?>
+        require_once __DIR__ . '/../../resources/views/inicio.php'; ?>
 
         <main class="container">
             <p style="color:black; font-size:3em; text-align:center">
@@ -24,6 +38,6 @@ class Error404Controller implements Controller
             </p>
         </main>
 
-        <?php require_once __DIR__ . '/../../fim.php';
+        <?php require_once __DIR__ . '/../../resources/views/fim.php';
     }
 }

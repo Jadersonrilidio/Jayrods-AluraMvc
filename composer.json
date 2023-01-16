@@ -15,6 +15,9 @@
     "scripts": {
         "db-init": "php bin/create_db",
         "vid-list": "php bin/get_all_videos_list",
-        "serve": "php -S localhost:8000 -t public/"
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S localhost:8000 -t public/"
+        ]
     }
 }
