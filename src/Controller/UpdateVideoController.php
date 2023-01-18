@@ -5,9 +5,13 @@ namespace Jayrods\AluraMvc\Controller;
 use Jayrods\AluraMvc\Controller\Controller;
 use Jayrods\AluraMvc\Entity\Video;
 use Jayrods\AluraMvc\Repository\VideoRepository;
+use Jayrods\AluraMvc\Repository\RepositoryFactory;
+use Jayrods\AluraMvc\Controller\Traits\HandleFile;
 
 class UpdateVideoController implements Controller
 {
+    use HandleFile;
+
     /**
      * 
      */
@@ -16,9 +20,9 @@ class UpdateVideoController implements Controller
     /**
      * 
      */
-    public function __construct(VideoRepository $videoRepository)
+    public function __construct(RepositoryFactory $repositoryFactory)
     {
-        $this->videoRepository = $videoRepository;
+        $this->videoRepository = $repositoryFactory->create('Video');
     }
 
     /**
@@ -44,9 +48,30 @@ class UpdateVideoController implements Controller
             return;
         }
 
-        $result = $this->videoRepository
-            ->update(new Video($id, $url, $title));
+        $video = new Video($id, $url, $title);
+
+        $this->handleFile($video);
+
+        $result = $this->videoRepository->update($video);
 
         $result ? header('Location: /?success=1') : header('Location: /?success=0');
+    }
+
+    /**
+     * 
+     */
+    private function handleImage(Video &$video, $image): void
+    {
+        $tmp_name = $_FILES['image']['tmp_name'];
+        $path = dirname(dirname(__DIR__)) . '/public/img/uploads/';
+        $name = uniqid('upload_');
+        $ext = '.jpg';
+
+        move_uploaded_file(
+            $tmp_name,
+            $path . $name . $ext
+        );
+
+        $video->setFilePath($name);
     }
 }

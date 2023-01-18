@@ -1,0 +1,17 @@
+#!usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$dbPath = dirname(__DIR__) . '/database/database.sqlite';
+
+$pdo = new PDO('sqlite:' . $dbPath);
+
+$query = "CREATE TABLE IF NOT EXISTS videos (id INTEGER PRIMARY KEY, url TEXT, title TEXT);";
+$pdo->exec($query);
+
+$query = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, password TEXT);";
+$pdo->exec($query);
+
+$query = "ALTER TABLE videos ADD COLUMN image TEXT";
+$pdo->exec($query);

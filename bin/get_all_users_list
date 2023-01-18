@@ -1,0 +1,18 @@
+#!usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$dbPath = dirname(__DIR__) . '/database/database.sqlite';
+
+$pdo = new PDO('sqlite:' . $dbPath);
+
+$query = "SELECT * FROM users;";
+
+$stmt = $pdo->query($query);
+
+echo "|\tID:\t|\tEmail:\t\t|\tPassword:\t" . PHP_EOL;
+
+while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    echo "|\t" . $user['id']  . "\t| " . $user['email'] . "\t| " . $user['password'] . PHP_EOL;
+}

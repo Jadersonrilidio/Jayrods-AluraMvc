@@ -3,24 +3,28 @@
 namespace Jayrods\AluraMvc\Entity;
 
 use Exception;
-use InvalidArgumentException;
 
 class Video implements Entity
 {
     /**
      * @var ?int
      */
-    private $id;
+    public $id;
 
     /**
      * @var string
      */
-    private $url;
+    public $url;
 
     /**
      * @var string
      */
-    private $title;
+    public $title;
+
+    /**
+     * @var ?string
+     */
+    public ?string $filePath = null;
 
     /**
      * 
@@ -37,13 +41,12 @@ class Video implements Entity
         $this->title = $title;
     }
 
-    private function setUrl(string $url)
+    /**
+     * 
+     */
+    public function setFilePath(?string $filePath): void
     {
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            throw new InvalidArgumentException('False URL provided');
-        }
-
-        $this->url = $url;
+        $this->filePath = $filePath;
     }
 
     /**
@@ -52,7 +55,7 @@ class Video implements Entity
      * 
      * @return void
      */
-    public function identify($id)
+    public function identify($id): void
     {
         if (!is_null($this->id)) {
             throw new Exception('Error: Id is already defined');
@@ -64,7 +67,7 @@ class Video implements Entity
     /**
      * 
      */
-    public function id()
+    public function id(): ?int
     {
         return $this->id;
     }
@@ -72,7 +75,7 @@ class Video implements Entity
     /**
      * 
      */
-    public function url()
+    public function url(): string
     {
         return $this->url;
     }
@@ -80,8 +83,29 @@ class Video implements Entity
     /**
      * 
      */
-    public function title()
+    public function title(): string
     {
         return $this->title;
     }
+
+    /**
+     * 
+     */
+    public function filePath(): ?string
+    {
+        return $this->filePath ?? null;
+    }
+
+    // /**
+    //  * //todo
+    //  */
+    // public function __serialize(): array
+    // {
+    //     return array(
+    //         'id'    => $this->id(),
+    //         'url'   => $this->url(),
+    //         'title' => $this->title(),
+    //         'image' => $this->filePath()
+    //     );
+    // }
 }

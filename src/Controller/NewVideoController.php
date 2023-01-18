@@ -5,9 +5,13 @@ namespace Jayrods\AluraMvc\Controller;
 use Jayrods\AluraMvc\Controller\Controller;
 use Jayrods\AluraMvc\Entity\Video;
 use Jayrods\AluraMvc\Repository\VideoRepository;
+use Jayrods\AluraMvc\Repository\RepositoryFactory;
+use Jayrods\AluraMvc\Controller\Traits\HandleFile;
 
 class NewVideoController implements Controller
 {
+    use HandleFile;
+
     /**
      * 
      */
@@ -16,9 +20,9 @@ class NewVideoController implements Controller
     /**
      * 
      */
-    public function __construct(VideoRepository $videoRepository)
+    public function __construct(RepositoryFactory $repositoryFactory)
     {
-        $this->videoRepository = $videoRepository;
+        $this->videoRepository = $repositoryFactory->create('Video');
     }
 
     /**
@@ -38,8 +42,11 @@ class NewVideoController implements Controller
             return;
         }
 
-        $result = $this->videoRepository
-            ->add(new Video(null, $url, $title));
+        $video = new Video(null, $url, $title);
+
+        $this->handleFile($video);
+
+        $result = $this->videoRepository->add($video);
 
         $result ? header('Location: /?success=1') : header('Location: /?success=0');
     }

@@ -1,7 +1,9 @@
 #!usr/bin/env php
 <?php
 
-$dbPath = __DIR__ . '/../database/database.sqlite';
+declare(strict_types=1);
+
+$dbPath = dirname(__DIR__) . '/database/database.sqlite';
 
 $pdo = new PDO('sqlite:' . $dbPath);
 

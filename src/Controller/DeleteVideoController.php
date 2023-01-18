@@ -4,6 +4,7 @@ namespace Jayrods\AluraMvc\Controller;
 
 use Jayrods\AluraMvc\Controller\Controller;
 use Jayrods\AluraMvc\Repository\VideoRepository;
+use Jayrods\AluraMvc\Repository\RepositoryFactory;
 
 class DeleteVideoController implements Controller
 {
@@ -15,9 +16,9 @@ class DeleteVideoController implements Controller
     /**
      * 
      */
-    public function __construct(VideoRepository $videoRepository)
+    public function __construct(RepositoryFactory $repositoryFactory)
     {
-        $this->videoRepository = $videoRepository;
+        $this->videoRepository = $repositoryFactory->create('Video');
     }
 
     /**

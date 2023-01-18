@@ -3,11 +3,10 @@
 namespace Jayrods\AluraMvc\Controller;
 
 use Jayrods\AluraMvc\Controller\Controller;
-use Jayrods\AluraMvc\Entity\Video;
 use Jayrods\AluraMvc\Repository\VideoRepository;
 use Jayrods\AluraMvc\Repository\RepositoryFactory;
 
-class FormVideoController implements Controller
+class DeleteImageController implements Controller
 {
     /**
      * 
@@ -28,13 +27,14 @@ class FormVideoController implements Controller
     public function processRequisition(): void
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-        $video = new Video(null, '', '');
-
-        if ($id !== false and $id !== null) {
-            $video = $this->videoRepository->find($id);
+        if ($id === false or $id === null) {
+            header('Location: /?success=0');
+            return;
         }
 
-        require_once dirname(dirname(__DIR__)) . '/resources/views/video-form.php';
+        $result = $this->videoRepository
+            ->removeImage($id);
+
+        $result ? header('Location: /?success=1') : header('Location: /?success=0');
     }
 }
