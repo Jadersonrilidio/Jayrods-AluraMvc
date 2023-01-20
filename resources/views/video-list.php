@@ -1,8 +1,8 @@
-<?php require_once __DIR__ . '/inicio.php'; ?>
+<?php $this->layout('layout'); ?>
 
 <ul class="videos__container" alt="videos alura">
 
-    <?php foreach ($videoslist as $video) : ?>
+    <?php foreach ($videoList as $video) : ?>
         <li class="videos__item">
             <?php if ($video->filePath() !== null) : ?>
                 <a href="<?= $video->url(); ?>">
@@ -25,8 +25,4 @@
         </li>
     <?php endforeach; ?>
 
-
-
 </ul>
-
-<?php require_once __DIR__ . '/fim.php';

@@ -2,43 +2,32 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
-use Jayrods\AluraMvc\Repository\VideoRepository;
-use Jayrods\AluraMvc\Repository\RepositoryFactory;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
+use League\Plates\Engine;
 
-class Error404Controller implements Controller
+class Error404Controller implements RequestHandlerInterface
 {
     /**
      * 
      */
-    private VideoRepository $videoRepository;
+    private Engine $templates;
 
     /**
      * 
      */
-    public function __construct(RepositoryFactory $repositoryFactory)
+    public function __construct(Engine $templates)
     {
-        $this->videoRepository = $repositoryFactory->create('Video');
+        $this->templates = $templates;
     }
 
     /**
      * 
      */
-    public function processRequisition(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        http_response_code(404);
-
-        require_once dirname(dirname(__DIR__)) . '/resources/views/inicio.php'; ?>
-
-        <main class="container">
-            <p style="color:black; font-size:3em; text-align:center">
-                <b>404</b>
-                <br>
-                <br>
-                NOT FOUND
-            </p>
-        </main>
-
-        <?php require_once dirname(dirname(__DIR__)) . '/resources/views/fim.php';
+        return new Response(404, [], $this->templates->render('not-found'));
     }
 }

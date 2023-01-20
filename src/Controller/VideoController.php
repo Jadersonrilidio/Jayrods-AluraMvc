@@ -2,23 +2,47 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
 use Jayrods\AluraMvc\Repository\RepositoryFactory;
 use Jayrods\AluraMvc\Repository\VideoRepository;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
+use League\Plates\Engine;
 
-class VideoController implements Controller
+class VideoController implements RequestHandlerInterface
 {
+    /**
+     * 
+     */
     private VideoRepository $videoRepository;
 
-    public function __construct(RepositoryFactory $repositoryFactory)
+    /**
+     * 
+     */
+    private Engine $templates;
+
+    /**
+     * 
+     */
+    public function __construct(RepositoryFactory $repositoryFactory, Engine $templates)
     {
         $this->videoRepository = $repositoryFactory->create('Video');
+        $this->templates = $templates;
     }
 
-    public function processRequisition(): void
+    /**
+     * 
+     */
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $videoslist = $this->videoRepository->all();
+        $videoList = $this->videoRepository->all();
 
-        require_once dirname(dirname(__DIR__)) . '/resources/views/video-list.php';
+
+        return new Response(
+            200,
+            [],
+            $this->templates->render('video-list', ['videoList' => $videoList])
+        );
     }
 }

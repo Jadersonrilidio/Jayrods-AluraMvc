@@ -2,12 +2,18 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
+use Nyholm\Psr7\Response;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
+use Jayrods\AluraMvc\Controller\Traits\FlashMessage;
 use Jayrods\AluraMvc\Repository\VideoRepository;
 use Jayrods\AluraMvc\Repository\RepositoryFactory;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-class DeleteImageController implements Controller
+class DeleteImageController implements RequestHandlerInterface
 {
+    use FlashMessage;
+
     /**
      * 
      */
@@ -24,17 +30,31 @@ class DeleteImageController implements Controller
     /**
      * 
      */
-    public function processRequisition(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        $queryParams = $request->getQueryParams();
+        $id = filter_var($queryParams['id'], FILTER_VALIDATE_INT);
+
         if ($id === false or $id === null) {
-            header('Location: /?success=0');
-            return;
+            $this->addErrorMessage('Error: Could not delete image. Image not found');
+            return new Response(302, [
+                'Location' => '/'
+            ]);
         }
 
         $result = $this->videoRepository
             ->removeImage($id);
 
-        $result ? header('Location: /?success=1') : header('Location: /?success=0');
+        if ($result) {
+            $this->addSuccessMessage('Image deleted');
+            return new Response(200, [
+                'Location' => '/'
+            ]);
+        } else {
+            $this->addErrorMessage('Error: Could not delete image');
+            return new Response(302, [
+                'Location' => '/'
+            ]);
+        }
     }
 }

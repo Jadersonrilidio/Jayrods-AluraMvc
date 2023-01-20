@@ -2,11 +2,14 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
 use Jayrods\AluraMvc\Repository\RepositoryFactory;
 use Jayrods\AluraMvc\Repository\VideoRepository;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
 
-class JsonVideoController implements Controller
+class JsonVideoController implements RequestHandlerInterface
 {
     private VideoRepository $videoRepository;
 
@@ -15,7 +18,7 @@ class JsonVideoController implements Controller
         $this->videoRepository = $repositoryFactory->create('Video');
     }
 
-    public function processRequisition(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $videosList = array_map(function ($video): array {
             return array(
@@ -27,9 +30,10 @@ class JsonVideoController implements Controller
             );
         }, $this->videoRepository->all());
 
-        header('Content-Type: application/json');
-        http_response_code(200);
-
-        echo json_encode($videosList);
+        return new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            json_encode($videosList)
+        );
     }
 }

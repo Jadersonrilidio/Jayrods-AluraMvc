@@ -4,6 +4,7 @@ namespace Jayrods\AluraMvc\Controller\Traits;
 
 use finfo as FileInfo;
 use Jayrods\AluraMvc\Entity\Video;
+use Psr\Http\Message\ServerRequestInterface;
 
 trait HandleFile
 {
@@ -13,22 +14,25 @@ trait HandleFile
      * 
      * @return bool
      */
-    public function handleFile(Video &$video): bool
+    private function handleFile(Video &$video, ServerRequestInterface $request): bool
     {
-        if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $mimeType = (new FileInfo(FILEINFO_MIME_TYPE))->file($_FILES['image']['tmp_name']);
+        $files = $request->getUploadedFiles();
+
+        /** @var UploadedFileInterface $uploadedFile */
+        $uploadedImage = $files['image'];
+
+        if ($uploadedImage->getError() === UPLOAD_ERR_OK) {
+            $tmpFile = $uploadedImage->getStream()->getMetadata('uri');
+            $mimeType = (new FileInfo(FILEINFO_MIME_TYPE))->file($tmpFile);
 
             if (preg_match('/^image\/[a-z]+$/', $mimeType)) {
                 $path = dirname(dirname(dirname(__DIR__))) . '/public/img/uploads/';
                 $ext = (explode('/', $mimeType))[1];
-                $name = uniqid('upload_');
+                $safeFileName = uniqid('upload_') . $ext;
 
-                move_uploaded_file(
-                    $_FILES['image']['tmp_name'],
-                    $path . "$name.$ext"
-                );
+                $uploadedImage->moveTo($path . $safeFileName);
 
-                $video->setFilePath("$name.$ext");
+                $video->setFilePath($safeFileName);
 
                 return true;
             }

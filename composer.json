@@ -11,6 +11,14 @@
             "Jayrods\\AluraMvc\\": "src/"
         }
     },
+    "require": {
+        "psr/http-message": "^1.0",
+        "nyholm/psr7": "^1.5",
+        "nyholm/psr7-server": "^1.0",
+        "psr/http-server-handler": "^1.0",
+        "php-di/php-di": "^6.4",
+        "league/plates": "^3.5"
+    },
     "scripts": {
         "dbinit": "php bin/db_init",
         "getvids": "php bin/get_all_videos_list",

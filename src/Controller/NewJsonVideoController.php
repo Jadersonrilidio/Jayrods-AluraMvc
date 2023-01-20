@@ -2,12 +2,15 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
 use Jayrods\AluraMvc\Repository\RepositoryFactory;
 use Jayrods\AluraMvc\Repository\VideoRepository;
 use Jayrods\AluraMvc\Entity\Video;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
 
-class NewJsonVideoController implements Controller
+class NewJsonVideoController implements RequestHandlerInterface
 {
     private VideoRepository $videoRepository;
 
@@ -16,11 +19,12 @@ class NewJsonVideoController implements Controller
         $this->videoRepository = $repositoryFactory->create('Video');
     }
 
-    public function processRequisition(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $request = file_get_contents('php://input');
+        $jsonContent = $request->getBody()->getContents();
 
-        $videoData = json_decode($request, true);
+        $videoData = json_decode($jsonContent, true);
+        // $videoData = $request->getParsedBody(); // more abstractive method, easier to use
 
         $video = new Video(null, $videoData['url'], $videoData['title']);
 
@@ -30,9 +34,10 @@ class NewJsonVideoController implements Controller
 
         $this->videoRepository->add($video);
 
-        header('Content-Type: application/json');
-        http_response_code(201);
-
-        echo json_encode(['message' => 'Video was successfuly created.']);
+        return new Response(
+            201,
+            ['Content-Type' => 'application/json'],
+            json_encode(['message' => 'Video was successfuly created.'])
+        );
     }
 }

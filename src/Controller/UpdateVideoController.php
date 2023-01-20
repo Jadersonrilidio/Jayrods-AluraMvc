@@ -2,15 +2,20 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
 use Jayrods\AluraMvc\Entity\Video;
 use Jayrods\AluraMvc\Repository\VideoRepository;
 use Jayrods\AluraMvc\Repository\RepositoryFactory;
 use Jayrods\AluraMvc\Controller\Traits\HandleFile;
+use Jayrods\AluraMvc\Controller\Traits\FlashMessage;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
 
-class UpdateVideoController implements Controller
+class UpdateVideoController implements RequestHandlerInterface
 {
-    use HandleFile;
+    use HandleFile,
+        FlashMessage;
 
     /**
      * 
@@ -28,50 +33,51 @@ class UpdateVideoController implements Controller
     /**
      * 
      */
-    public function processRequisition(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $url = filter_input(INPUT_POST, 'url', FILTER_VALIDATE_URL);
+        $queryParams = $request->getQueryParams();
+        $postVars = $request->getParsedBody();
+
+        $url = filter_var($postVars['url'], FILTER_VALIDATE_URL);
         if ($url === false) {
-            header('Location: /?success=0');
-            return;
+            $this->addErrorMessage('Error: Could not update video. Invalid url');
+            return new Response(302, [
+                'Location' => '/'
+            ]);
         }
 
-        $title = filter_input(INPUT_POST, 'title');
+        $title = filter_var($postVars['title']);
         if ($title === false) {
-            header('Location: /?success=0');
-            return;
+            $this->addErrorMessage('Error: Could not update video. Invalid title');
+            return new Response(302, [
+                'Location' => '/'
+            ]);
         }
 
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+        $id = filter_var($queryParams['id'], FILTER_VALIDATE_INT);
         if ($id === false or $id === null) {
-            header('Location: /?success=0');
-            return;
+            $this->addErrorMessage('Error: Could not update video. Video not found');
+            return new Response(302, [
+                'Location' => '/'
+            ]);
         }
 
         $video = new Video($id, $url, $title);
 
-        $this->handleFile($video);
+        $this->handleFile($video, $request);
 
         $result = $this->videoRepository->update($video);
 
-        $result ? header('Location: /?success=1') : header('Location: /?success=0');
-    }
-
-    /**
-     * 
-     */
-    private function handleImage(Video &$video, $image): void
-    {
-        $tmp_name = $_FILES['image']['tmp_name'];
-        $path = dirname(dirname(__DIR__)) . '/public/img/uploads/';
-        $name = uniqid('upload_');
-        $ext = '.jpg';
-
-        move_uploaded_file(
-            $tmp_name,
-            $path . $name . $ext
-        );
-
-        $video->setFilePath($name);
+        if ($result) {
+            $this->addSuccessMessage('Video updated');
+            return new Response(200, [
+                'Location' => '/'
+            ]);
+        } else {
+            $this->addErrorMessage('Error: Could not update video.');
+            return new Response(302, [
+                'Location' => '/'
+            ]);
+        }
     }
 }

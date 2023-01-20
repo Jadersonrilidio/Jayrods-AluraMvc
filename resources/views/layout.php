@@ -17,7 +17,6 @@
 <body>
 
     <header>
-
         <nav class="cabecalho">
             <a class="logo" href="/"></a>
 
@@ -26,5 +25,24 @@
                 <a href="/logout" class="cabecalho__sair">Sair</a>
             </div>
         </nav>
-
     </header>
+
+    <?php if (isset($_SESSION['error_message'])) : ?>
+        <h2 class="formulario__titulo erro">
+            <?= $_SESSION['error_message'];
+            unset($_SESSION['error_message']); ?>
+        </h2>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['success_message'])) : ?>
+        <h2 class="formulario__titulo sucesso">
+            <?= $_SESSION['success_message'];
+            unset($_SESSION['success_message']); ?>
+        </h2>
+    <?php endif; ?>
+
+    <?php echo $this->section('content'); ?>
+
+</body>
+
+</html>

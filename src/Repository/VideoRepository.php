@@ -120,6 +120,10 @@ class VideoRepository implements Repository
     {
         $video = $this->find($id);
 
+        if ($video->filePath() === null) {
+            return false;
+        }
+
         $query = "UPDATE videos SET url = :url, title = :title, image = :image WHERE id = :id";
 
         $stmt = $this->pdo->prepare($query);

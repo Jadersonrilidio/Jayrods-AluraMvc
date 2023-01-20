@@ -2,12 +2,19 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
+use Jayrods\AluraMvc\Controller\Traits\FlashMessage;
 use Jayrods\AluraMvc\Repository\UserRepository;
 use Jayrods\AluraMvc\Repository\RepositoryFactory;
+use Jayrods\AluraMvc\Entity\User;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
 
-class LoginController implements Controller
+class LoginController implements RequestHandlerInterface
 {
+    use FlashMessage;
+
     /**
      * @var UserRepository
      */
@@ -24,25 +31,32 @@ class LoginController implements Controller
     /**
      * 
      */
-    public function processRequisition(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-        $password = filter_input(INPUT_POST, 'password');
+        $postVars = $request->getParsedBody();
 
-        $user = $this->userRepository->findByEmail($email);
+        $email = filter_var($postVars['email'], FILTER_VALIDATE_EMAIL);
+        $password = filter_var($postVars['password']);
+
+        $user = $this->userRepository->findByEmail($email) ?? new User(null, '', '');
 
         $validation = password_verify($password, $user->password() ?? '');
 
-        if ($validation and password_needs_rehash($user->password(), PASSWORD_DEFAULT)) {
+        if ($validation and password_needs_rehash($user->password(), PASSWORD_ARGON2ID)) {
             $this->userRepository->passwordRehash($user->id(), $password);
         }
 
         if ($validation) {
+            $this->addSuccessMessage("You're logged in!");
             $_SESSION['logged'] = true;
-            header('Location: /');
-            return;
+            return new Response(200, [
+                'Location' => '/'
+            ]);
         } else {
-            header('Location: /login?success=0');
+            $this->addErrorMessage('Error: Invalid login or password');
+            return new Response(302, [
+                'Location' => '/login'
+            ]);
         }
     }
 }

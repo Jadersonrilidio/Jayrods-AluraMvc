@@ -2,12 +2,16 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
 use Jayrods\AluraMvc\Entity\Video;
 use Jayrods\AluraMvc\Repository\VideoRepository;
 use Jayrods\AluraMvc\Repository\RepositoryFactory;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Nyholm\Psr7\Response;
+use League\Plates\Engine;
 
-class FormVideoController implements Controller
+class FormVideoController implements RequestHandlerInterface
 {
     /**
      * 
@@ -17,17 +21,25 @@ class FormVideoController implements Controller
     /**
      * 
      */
-    public function __construct(RepositoryFactory $repositoryFactory)
+    private Engine $templates;
+
+    /**
+     * 
+     */
+    public function __construct(RepositoryFactory $repositoryFactory, Engine $templates)
     {
         $this->videoRepository = $repositoryFactory->create('Video');
+        $this->templates = $templates;
     }
 
     /**
      * 
      */
-    public function processRequisition(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        $queryParams = $request->getQueryParams();
+
+        $id = filter_var($queryParams['id'] ?? null, FILTER_VALIDATE_INT);
 
         $video = new Video(null, '', '');
 
@@ -35,6 +47,10 @@ class FormVideoController implements Controller
             $video = $this->videoRepository->find($id);
         }
 
-        require_once dirname(dirname(__DIR__)) . '/resources/views/video-form.php';
+        return new Response(
+            200,
+            [],
+            $this->templates->render('video-form', ['video' => $video])
+        );
     }
 }

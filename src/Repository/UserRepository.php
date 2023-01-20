@@ -96,7 +96,7 @@ class UserRepository implements Repository
         $query = "UPDATE users SET password = :password WHERE id = :id;";
 
         $stmt = $this->pdo->prepare($query);
-        $stmt->bindValue(':password', password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
+        $stmt->bindValue(':password', password_hash($password, PASSWORD_ARGON2ID), PDO::PARAM_STR);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
         return $stmt->execute();
@@ -145,7 +145,7 @@ class UserRepository implements Repository
      * 
      * @return User
      */
-    public function findByEmail(string $email): User
+    public function findByEmail(string $email): ?User
     {
         $query = "SELECT * FROM users WHERE email = :email;";
 
@@ -154,7 +154,7 @@ class UserRepository implements Repository
         $stmt->bindValue(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
 
-        return $this->hydrateUser($stmt)[0];
+        return $this->hydrateUser($stmt)[0] ?? null;
     }
 
     /**

@@ -24,6 +24,10 @@ body {
 
 /* ESTILOS DO HEADER */
 
+body > header {
+    height: 80px;
+}
+
 .cabecalho {
     background-color: white;
     position: fixed;
@@ -108,4 +112,14 @@ body {
         height: 100vh;
     }
 
+}
+
+.formulario__titulo.erro {
+    color: red;
+    margin-top: 1em;
+}
+
+.formulario__titulo.sucesso {
+    color: greenyellow;
+    margin-top: 1em;
 }

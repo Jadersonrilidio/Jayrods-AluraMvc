@@ -2,34 +2,38 @@
 
 namespace Jayrods\AluraMvc\Controller;
 
-use Jayrods\AluraMvc\Controller\Controller;
-use Jayrods\AluraMvc\Repository\RepositoryFactory;
-use Jayrods\AluraMvc\Repository\UserRepository;
+use Jayrods\AluraMvc\Controller\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
+use League\Plates\Engine;
 
-class LoginFormController implements Controller
+class LoginFormController implements RequestHandlerInterface
 {
     /**
-     * @var UserRepository
+     * @var League\Plates\Engine
      */
-    private UserRepository $userRepository;
+    private Engine $templates;
 
     /**
      * 
      */
-    public function __construct(RepositoryFactory $repositoryFactory)
+    public function __construct(Engine $templates)
     {
-        $this->userRepository = $repositoryFactory->create('User');
+        $this->templates = $templates;
     }
 
     /**
      * 
      */
-    public function processRequisition(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         if (($_SESSION['logged'] ?? false) === true) {
-            header('Location: /');
-            return;
+            return new Response(302, [
+                'Location' => '/'
+            ]);
         }
-        require_once dirname(dirname(__DIR__)) . '/resources/views/login.php';
+
+        return new Response(200, [], $this->templates->render('login'));
     }
 }
