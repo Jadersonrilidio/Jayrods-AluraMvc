@@ -16,7 +16,7 @@ Project developed during Alura's PHP courses concerning MVC arquitecture, securi
  - Implementation of Plates as template engine.
 
 
-## Intalling and Using this Project
+## Installation and settings
 
 Clone the project from the repository:
 
